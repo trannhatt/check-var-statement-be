@@ -1,30 +1,22 @@
 const Trie = require('trie-prefix-tree');
 const xlsx = require('xlsx');
 
-// Tạo Trie để lưu trữ các từ
-const detailTrie = new Trie();
-
-// Hàm để khởi tạo Trie từ file Excel
-function initializeTrieFromFile(filePath) {
+function initializeTrie(filePath) {
   const workbook = xlsx.readFile(filePath);
-  const sheetName = workbook.SheetNames[0];  // Đọc sheet đầu tiên
+  const sheetName = workbook.SheetNames[0];
   const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-  // Kiểm tra dữ liệu trước khi thêm vào Trie
-  sheetData.forEach(row => {
-    if (row.detail && typeof row.detail === 'string') {
-      const detail = String(row.detail);  // Chuyển phần detail thành chuỗi
-      console.log('Adding detail to Trie:', detail);  // In chi tiết đang thêm vào Trie
-      detailTrie.addWord(detail);  // Thêm phần detail vào Trie
-    } else {
-      console.log('Warning: Missing or invalid detail in row', row);
-    }
-  });
 
-  console.log('Trie đã được khởi tạo từ file dữ liệu');
+  // Lọc và chỉ lấy cột `detail` chứa chuỗi
+  const details = sheetData
+    .filter(row => row.detail && typeof row.detail === 'string')
+    .map(row => row.detail);
+
+
+  // Khởi tạo Trie
+  const trie = Trie(details);
+  console.log('Trie đã khởi tạo thành công!');
+  return trie;
 }
 
-module.exports = {
-  detailTrie,
-  initializeTrieFromFile,
-};
+module.exports = initializeTrie;

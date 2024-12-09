@@ -1,25 +1,24 @@
-// /controllers/trieController.js
-const { detailTrie } = require('../config/trieConfig');
+const initializeTrie = require('../config/trieConfig');
 
-// Tìm kiếm theo detail (substring search)
-function searchByDetail(req, res) {
-  const detail = req.params.detail;
-  console.log('Searching for detail:', detail);
+// Khởi tạo Trie từ file CSV (hoặc Excel)
+const trie = initializeTrie('./uploads/chuyen_khoan.csv');
 
-  // Lấy tất cả các từ từ Trie
-  const allWords = detailTrie.getWords();  // Lấy tất cả các từ trong Trie
+// Hàm xử lý tìm kiếm
+const searchPrefix = (req, res) => {
+  const prefix = req.params.detail; // Lấy tiền tố từ URL
+  console.log('Prefix nhận được:', prefix);
 
-  // Lọc các từ có chứa chuỗi tìm kiếm (substring)
-  const result = allWords.filter(word => word.includes(detail));
+  // Kiểm tra dữ liệu trong Trie
+  const results = trie.getPrefix(prefix); // Tìm kiếm tiền tố
+  console.log('Kết quả tìm kiếm:', results);
 
-  // Nếu không tìm thấy, trả về thông báo lỗi
-  if (result.length === 0) {
-    return res.status(404).json({ message: 'Detail not found' });
+  // Xử lý nếu không có kết quả
+  if (!results || results.length === 0) {
+    return res.status(404).json({ message: 'No matching results found.' });
   }
 
-  res.json({ detail: detail, result: result });
-}
-
-module.exports = {
-  searchByDetail,
+  // Trả về kết quả
+  res.json({ prefix, results });
 };
+
+module.exports = { searchPrefix };

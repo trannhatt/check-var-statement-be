@@ -1,9 +1,8 @@
-// /routes/trieRoute.js
 const express = require('express');
 const router = express.Router();
-const trieController = require('../controllers/trieController');
+const { searchPrefix } = require('../controllers/trieController');
 
-// Tìm kiếm theo detail
-router.get('/api/search/:detail', trieController.searchByDetail);
+// Định nghĩa route cho tìm kiếm
+router.get('/search/:detail', searchPrefix);
 
 module.exports = router;
