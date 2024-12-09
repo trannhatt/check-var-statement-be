@@ -1,13 +1,20 @@
-const express = require('express');
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+const { loadCSV } = require("./controllers/trieController");
+const trieRoutes = require("./routes/trieRoutes");
+
 const app = express();
 const port = 3000;
 
-// Import route
-const searchRoute = require('./routes/trieRoutes');
+const upload = multer({ dest: "uploads/" });
 
-// Sử dụng route
-app.use('/api', searchRoute);
+app.use(express.json());
+
+loadCSV();
+
+app.use("/api/trie", trieRoutes);
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
