@@ -213,17 +213,41 @@ class Trie {
     return result;
   }
   getAllData() {
-    const traverse = (node, path = "", data = []) => {
+    const uniqueTransactions = new Set();
+
+    const traverse = (node) => {
       if (node.isEndOfWord) {
-        data.push({ phrase: path, transactions: node.transactions });
+        node.transactions.forEach((transaction) => {
+          // Tạo key duy nhất để loại bỏ trùng lặp
+          const key = `${transaction.trans_no}_${transaction.date_time}`;
+          uniqueTransactions.add(key);
+        });
       }
+
       for (let char in node.children) {
-        traverse(node.children[char], path + " " + char, data);
+        traverse(node.children[char]);
       }
-      return data;
     };
 
-    return traverse(this.root);
+    // Start traversal from root
+    traverse(this.root);
+
+    // Convert Set back to array of transaction objects
+    const transactions = [];
+    const visitedKeys = new Set();
+
+    this.getAllTransactions().forEach((transaction) => {
+      const key = `${transaction.trans_no}_${transaction.date_time}`;
+      if (!visitedKeys.has(key)) {
+        transactions.push(transaction);
+        visitedKeys.add(key);
+      }
+    });
+
+    // Sắp xếp theo trans_no
+    return transactions.sort(
+      (a, b) => parseInt(a.trans_no) - parseInt(b.trans_no)
+    );
   }
 }
 
